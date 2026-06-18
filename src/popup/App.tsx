@@ -88,7 +88,10 @@ export default function App() {
     await loadGroupsAndSelection();
   }
 
-  function handleLogout() {
+  async function handleLogout() {
+    await new Promise<void>((resolve) => {
+      chrome.runtime.sendMessage({ type: 'LOGOUT' }, () => resolve());
+    });
     setUser(null);
     setPage('login');
   }
@@ -108,46 +111,56 @@ export default function App() {
   }
 
   return (
-    <div className="w-[380px] min-h-[500px] bg-gray-50 font-body">
-      <header className="bg-white/80 backdrop-blur-lg border-b border-gray-200 px-4 py-2.5 sticky top-0 z-10">
+    <div className="w-[320px] bg-gray-50 font-body">
+      <header className="bg-white/80 backdrop-blur-lg border-b border-gray-200 px-3 py-1.5 sticky top-0 z-10">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-bold text-xs shadow-md">
+          <div className="flex items-center gap-1.5">
+            <div className="w-5 h-5 rounded-md bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-bold text-[10px] shadow-md">
               S
             </div>
-            <h1 className="text-base font-display font-bold text-gray-900">{t('app.name')}</h1>
+            <h1 className="text-sm font-display font-bold text-gray-900">{t('app.name')}</h1>
           </div>
           {user && (
-            <button
-              onClick={() => setPage('settings')}
-              className="text-gray-500 hover:text-gray-700 transition-colors"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setPage('settings')}
+                className="text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </button>
+              <button
+                onClick={handleLogout}
+                className="text-gray-500 hover:text-red-600 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+              </button>
+            </div>
           )}
         </div>
       </header>
 
-      <main className="p-4">
+      <main className="px-2.5 pt-2.5 pb-0 flex flex-col">
         {page === 'login' && (
           <LoginForm onSuccess={handleLoginSuccess} />
         )}
         {page === 'main' && user && (
-          <div className="space-y-3">
-            <div className="bg-white/72 backdrop-blur-sm rounded-2xl border border-white/45 p-3 shadow-sm">
+          <div className="space-y-1.5">
+            <div className="bg-white/72 backdrop-blur-sm rounded-xl border border-white/45 p-1.5 shadow-sm">
               <p className="text-xs text-gray-500">{t('main.welcomeBack')}</p>
-              <p className="text-base font-semibold text-gray-900">{user.name}</p>
+              <p className="text-sm font-semibold text-gray-900">{user.name}</p>
             </div>
             {groups.length > 0 && (
-              <div className="bg-white/72 backdrop-blur-sm rounded-2xl border border-white/45 p-3 shadow-sm">
-                <label className="text-xs text-gray-500 block mb-1.5">{t('settings.defaultGroup')}</label>
+              <div className="bg-white/72 backdrop-blur-sm rounded-xl border border-white/45 p-1.5 shadow-sm">
+                <label className="text-xs text-gray-500 block mb-0.5">{t('settings.defaultGroup')}</label>
                 <select
                   value={selectedGroupId}
                   onChange={(e) => handleGroupChange(e.target.value)}
-                  className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-gray-400 transition-all"
+                  className="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-900 focus:outline-none focus:border-gray-400 transition-all"
                 >
                   {groups.map((group) => (
                     <option key={group.id} value={group.id}>
@@ -157,26 +170,22 @@ export default function App() {
                 </select>
               </div>
             )}
-            <div className="bg-white/72 backdrop-blur-sm rounded-2xl border border-white/45 p-3 shadow-sm">
-              <p className="text-xs text-gray-500 mb-1.5">{t('main.quickActions')}</p>
-              <p className="text-[11px] text-gray-400">
+            <div className="bg-white/72 backdrop-blur-sm rounded-xl border border-white/45 border-b-0 p-1.5 shadow-sm">
+              <p className="text-xs text-gray-500 mb-0.5">{t('main.quickActions')}</p>
+              <p className="text-xs text-gray-400">
                 {t('main.quickActionsDesc')}
               </p>
             </div>
-            <button
-              onClick={() => setPage('settings')}
-              className="w-full ghost"
-            >
-              {t('common.settings')}
-            </button>
+
           </div>
         )}
         {page === 'settings' && (
-          <Settings
-            user={user}
-            onLogout={handleLogout}
-            onBack={() => setPage('main')}
-          />
+          <div className="flex flex-col justify-center flex-1">
+            <Settings
+              user={user}
+              onBack={() => setPage('main')}
+            />
+          </div>
         )}
         {page === 'search-results' && (
           <StockSearchResult
