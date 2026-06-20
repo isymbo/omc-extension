@@ -55,6 +55,7 @@ export default function App() {
   async function handleGroupChange(groupId: string) {
     setSelectedGroupId(groupId);
     await setStorageItem(STORAGE_KEYS.DEFAULT_GROUP_ID, groupId);
+    chrome.runtime.sendMessage({ type: 'UPDATE_DEFAULT_GROUP', groupId });
   }
 
   async function checkAuth() {
@@ -154,7 +155,7 @@ export default function App() {
               <p className="text-xs text-gray-500">{t('main.welcomeBack')}</p>
               <p className="text-sm font-semibold text-gray-900">{user.name}</p>
             </div>
-            {groups.length > 0 && (
+            {groups.filter(g => !(g.type === 'system' && (g.id === 'all' || g.id === 'holdings'))).length > 0 && (
               <div className="bg-white/72 backdrop-blur-sm rounded-xl border border-white/45 p-1.5 shadow-sm">
                 <label className="text-xs text-gray-500 block mb-0.5">{t('settings.defaultGroup')}</label>
                 <select
@@ -162,7 +163,7 @@ export default function App() {
                   onChange={(e) => handleGroupChange(e.target.value)}
                   className="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-900 focus:outline-none focus:border-gray-400 transition-all"
                 >
-                  {groups.map((group) => (
+                  {groups.filter(g => !(g.type === 'system' && (g.id === 'all' || g.id === 'holdings'))).map((group) => (
                     <option key={group.id} value={group.id}>
                       {group.name || (group.type === 'system' ? group.id : t('group.untitled'))}
                     </option>
